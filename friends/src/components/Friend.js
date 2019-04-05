@@ -1,22 +1,44 @@
-import React from 'react'
+import React, { Component } from 'react';
+import FriendCard from './FriendCard';
+import axios from 'axios';
 
-export default function Friend(props) {
-  const styles = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    border: '2px solid black',
-    padding: '20px',
-    margin: '10px'
+export default class Friend extends Component {
+  state = {
+    friend: {}
+  }
+  
+  componentDidMount() {
+    if(this.props.friends.length === 0) {
+      axios
+        .get('http://localhost:5000/friends')
+        .then(response => {
+          this.setState({ friend: response.data.find(friend => `${friend.id}` === this.props.match.params.id) })
+        })
+        .catch(err => console.log(err))
+    } else {
+      const friend = this.props.friends.find(
+        friend => `${friend.id}` === this.props.match.params.id
+      )
+      this.setState({ friend: friend })
+    }
   }
 
-  const { name, age, email } = props.friend
+  goBack = () => {
+    this.props.history.push('/friends/')
+  }
 
-  return ( 
-    <div style = { styles }>
-      Name: { name }<br />
-      Age: { age }<br />
-      Email: { email }<br />
-    </div>
-  )
+  render() {
+    return ( 
+      <>
+      <FriendCard 
+        friend = { this.state.friend }
+        delete = { this.props.delete }
+      />
+      <button onClick = { () => this.goBack() } style = {{
+        padding: '10px 20px',
+        margin: '0 10px'
+      }}>Back</button>
+      </>
+    )
+  }
 }

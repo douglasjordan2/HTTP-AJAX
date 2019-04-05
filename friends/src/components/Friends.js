@@ -1,35 +1,30 @@
-import React, { Component } from 'react';
-import Friend from './Friend';
+import React from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import FriendCard from './FriendCard';
 
-export default class Friends extends Component {
-  state = {
-    friends: []
+export default function Friends(props) {
+  const styles = {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap'
   }
 
-  componentDidMount() {
-    axios
-      .get('http://localhost:5000/friends')
-      .then(response => {
-        this.setState({ friends: response.data })
-      })
-      .catch(err => console.log(err));
+  const goToItem = (event, friend) => {
+    event.preventDefault();
+    props.history.push(`/friends/${friend.id}`)
   }
-
-  render() { console.log(this.props)
-    return (
-      <div style = { styles }>
-        { this.state.friends.map(friend => (
-            <Friend 
-              friend = { friend }
-            />
-        )) }
-      </div>
-    )
-  }
-}
-
-const styles = {
-  display: 'flex',
-  flexWrap: 'wrap'
+  
+  return (
+    <div style = { styles }>
+      { props.friends.map(friend => (
+        <div onClick = { event => goToItem(event, friend) }>
+          <FriendCard 
+            friend = { friend }
+            delete = { props.delete }
+          />
+        </div>
+      )) }
+    </div>
+  )
 }
